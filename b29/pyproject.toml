@@ -1,0 +1,12 @@
+[project]
+name = "b29"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.117.1",
+    "requests>=2.32.5",
+    "sqlmodel>=0.0.25",
+    "uvicorn>=0.37.0",
+]
