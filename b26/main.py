@@ -6,6 +6,7 @@ from db import (
     create_user,
     delete_user,
     update_user,
+    db_get_all_users,
     UserSchema
 )
 create_db_and_tables()
@@ -23,19 +24,19 @@ def create_one_user(data: UserSchema):
 
 @app.get('/users')
 def get_all_users():
-    ...
+    return db_get_all_users(session=session)
 
 @app.put('/users/{username}')
 def update_one_user(username: str):
-    ...
+    return  update_user(username=username, new_password='new_password_123', session=session)
 
 @app.delete('/users')
 def delete_all_users():
-    ...
+    return delete_user(session=session)
 
 @app.delete('/users/{username}')
 def delete_one_users(username: str):
-    ...
+    return delete_user(username=username, session=session)
 
 
 # 127.0.0.1:8000

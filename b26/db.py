@@ -31,9 +31,25 @@ def create_user(username: str, password: str, session: Session):
     session.refresh(user)
     return user.model_dump()
 
+
 def get_user(username: str, session: Session):
     statement = select(User).where(User.username == username)
     return session.exec(statement).first().model_dump()
+
+def db_get_all_users(session: Session):
+    statement = select(User)
+    users = session.exec(statement).all()
+    return [user.model_dump() for user in users]
+
+def db_update_all_users(new_password: str, session: Session):
+    statement = select(User)
+    users = session.exec(statement).all()
+    for user in users:
+        user.password = new_password
+        session.add(user)
+    session.commit()
+    return [user.model_dump() for user in users]
+
 
 def update_user(username: str, new_password: str, session: Session):
     user = get_user(username, session)

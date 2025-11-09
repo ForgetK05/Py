@@ -1,6 +1,6 @@
 from passlib.hash import argon2, bcrypt, sha256_crypt
 from dotenv import load_dotenv
-import jwt
+import jwt as jwt
 
 import datetime
 

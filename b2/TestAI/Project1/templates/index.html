@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Giải phương trình (Flask + SymPy + JavaScript)</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #result { margin-top: 20px; font-size: 1.2em; }
+        #error { color: red; }
+    </style>
+</head>
+<body>
+    <h2>Nhập phương trình của bạn (để bằng 0)</h2>
+    
+    <form id="solve-form">
+        <label for="expression">Phương trình (ví dụ: x**2 - 4):</label>
+        <input type="text" id="expression" name="expression" value="x**2 - 4">
+        
+        <label for="variable">Biến (ví dụ: x):</label>
+        <input type="text" id="variable" name="variable" value="x">
+        
+        <input type="submit" value="Giải">
+    </form>
+
+    <h3>Kết quả:</h3>
+    <div id="result"></div>
+    <div id="error"></div>
+
+    <script>
+        // 1. Tìm form và lắng nghe sự kiện 'submit'
+        document.getElementById('solve-form').addEventListener('submit', async function(event) {
+            
+            // 2. Ngăn chặn hành vi submit (tải lại trang) mặc định của form
+            event.preventDefault(); 
+            
+            // 3. Thu thập dữ liệu từ các ô input
+            const expression = document.getElementById('expression').value;
+            const variable = document.getElementById('variable').value;
+            
+            // Xóa kết quả và lỗi cũ
+            document.getElementById('result').innerHTML = "Đang tính toán...";
+            document.getElementById('error').innerHTML = "";
+
+            try {
+                // 4. Gửi dữ liệu đến server (route /solve) bằng fetch
+                const response = await fetch('/solve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Báo cho server biết ta gửi JSON
+                    },
+                    body: JSON.stringify({ // Chuyển đổi object JS thành chuỗi JSON
+                        expression: expression,
+                        variable: variable 
+                    })
+                });
+                
+                // 5. Chuyển đổi câu trả lời từ server (JSON) thành object JS
+                const data = await response.json();
+
+                // 6. Xử lý kết quả
+                if (data.success) {
+                    // 7. Hiển thị kết quả LaTeX vào div#result
+                    // Chúng ta dùng dấu ngoặc \\( ... \\) để MathJax biết đây là công thức
+                    document.getElementById('result').innerHTML = `\\[ ${data.solution} \\]`;
+                    
+                    // 8. Quan trọng: Yêu cầu MathJax render lại công thức mới
+                    MathJax.typeset();
+                } else {
+                    // Hiển thị lỗi
+                    document.getElementById('error').innerHTML = `Lỗi: ${data.error}`;
+                    document.getElementById('result').innerHTML = "";
+                }
+
+            } catch (error) {
+                console.error('Lỗi khi fetch:', error);
+                document.getElementById('error').innerHTML = "Lỗi kết nối đến server.";
+                document.getElementById('result').innerHTML = "";
+            }
+        });
+    </script>
+</body>
+</html>
